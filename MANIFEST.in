@@ -1,0 +1,6 @@
+include LICENSE
+include README.md
+recursive-include matomo/templates *
+recursive-include matomo/templatetags *
+recursive-include matomo/tools *
+recursive-include docs *
