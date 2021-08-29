@@ -6,6 +6,8 @@ from django.conf import settings
 class Matomo(object):
     """
     TODO
+    !!!IMPORTANT!!! - Use script piece 1 for configuration commands. NOT IMPLEMENTED
+
     Allow users to define their own things
     Make the script ordering abide by a rule other than as_received
 
@@ -41,10 +43,8 @@ class Matomo(object):
            </script>
            <noscript><p><img src="//%s/piwik.php?idsite=%s" style="border:0;" alt="" /></p></noscript>
             """ % (tracking_url, site_id)
-        self.script_start = f"""
+        self.script_start = """
             <script type="text/javascript">
-            {UTILITY_METHODS}
-
             """
         self.user_script_pieces = {}
         self.script_pieces = {
@@ -58,12 +58,13 @@ class Matomo(object):
                     var u="//%s/";
                     _paq.push(['setTrackerUrl', u+'matomo.php']);
                     _paq.push(['setSiteId', %s]);
+            """ % (tracking_url, site_id),
+            1: """
+                    %s;
                     var d=document, g=d.createElement('script'), s=d.getElementsByTagName('script')[0];
                     g.type='text/javascript'; g.async=true; g.defer=true; g.src=u+'matomo.js'; s.parentNode.insertBefore(g,s);
                 })();
-
-            """ % (tracking_url, site_id),
-
+            """,
         }
 
     def build_script(self):
@@ -79,7 +80,7 @@ class Matomo(object):
                 script += piece
             except KeyError:
                 break
-        if settings.MATOMO_USER_DEFAULT_BANNER:
+        if settings.MATOMO_USE_DEFAULT_BANNER:
             script += self.bind_event("accept-tracking", "rememberConsent")
             script += self.bind_event("reject-tracking", "forgetConsent")
         return script + self.script_end
@@ -185,8 +186,8 @@ class Matomo(object):
         args=None, js_event="click"
         ):
         """
-        Build a javascript command to bind an onClick event to some
-        element
+        Build a javascript command to bind an event to some
+        element with a provided callback or generated paq command
 
         NOTE: You can pass an entire function body to this and it will work.
 
