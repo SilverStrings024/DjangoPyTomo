@@ -1,11 +1,20 @@
-from analytics.models import Visitor
-from tools import utils
 from django.utils.safestring import mark_safe
 from django.conf import settings
-from .tools.utils import Matomo
+from matomo.tools import utils
+
+def default_tracker(request):
+    """
+    Provide a default Matomo tracker.
+    """
+    matomo = utils.Matomo()
+
+
 
 def dynamic_tracker(request):
-    matomo = Matomo()
+    """
+    Basically for testing at the moment.
+    """
+    matomo = utils.Matomo()
     accept_bind = matomo.bind_event(elem_id='accept-tos-btn', callback='setCookie("can_track", "true")')
     reject_bind = matomo.bind_event(elem_id='reject-tos-btn', callback='setCookie("can_track", "false")')
     # Add the event bind loop to listen for consent
@@ -17,13 +26,5 @@ def dynamic_tracker(request):
         matomo.add_cmd("alwaysUseSendBeacon")
     if request.user.is_authenticated:
         matomo.add_cmd("setUserId", [request.user.full_name])
-    elif utils.can_track(request):
-        ip = utils.get_client_ip(request)
-        try:
-            visitor = Visitor.objects.get(ip=ip)
-        except:
-            visitor = Visitor(ip_address=ip)
-            visitor.save()
-        matomo.add_cmd("setUserId", [f"Visitor #{visitor.id}"])
     # Normal matomo things
     return {'matomo': matomo, 'default_tracker': mark_safe(matomo.build_script())}

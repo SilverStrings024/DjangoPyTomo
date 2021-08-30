@@ -28,8 +28,8 @@ class Matomo(object):
     _paq.push(['setSiteId', %(siteid)s]);
     """
     def __init__(self, **kwargs) -> None:
+        #self.__tracker_configs = self.build_config_cmds()
         self.__used_var_names = []
-        # Ordering doesn't really matter much here
         self.__onload_scripts = {}
         if not settings.DEBUG:
             site_id = settings.MATOMO_SITE_ID
@@ -37,8 +37,6 @@ class Matomo(object):
         else:
             site_id=1
             tracking_url="ThisIsATest.NoTouchy"
-        self.__tracker_configs = {}
-        self.__script_ordering = "as_received"
         self.script_end = """
            </script>
            <noscript><p><img src="//%s/piwik.php?idsite=%s" style="border:0;" alt="" /></p></noscript>
@@ -49,22 +47,21 @@ class Matomo(object):
         self.user_script_pieces = {}
         self.script_pieces = {
             # tracking code
-            0: \
-            """
-                var _paq = window._paq || [];
-                _paq.push(['trackPageView']);
-                _paq.push(['enableLinkTracking']);
-                (function() {
-                    var u="//%s/";
-                    _paq.push(['setTrackerUrl', u+'matomo.php']);
-                    _paq.push(['setSiteId', %s]);
-            """ % (tracking_url, site_id),
+            0: """
+                    var _paq = window._paq || [];
+                    _paq.push(['trackPageView']);
+                    _paq.push(['enableLinkTracking']);
+                    (function() {
+                        var u="//%s/";
+                        _paq.push(['setTrackerUrl', u+'matomo.php']);
+                        _paq.push(['setSiteId', %s]);
+                """ % (tracking_url, site_id),
             1: """
-                    %s;
-                    var d=document, g=d.createElement('script'), s=d.getElementsByTagName('script')[0];
-                    g.type='text/javascript'; g.async=true; g.defer=true; g.src=u+'matomo.js'; s.parentNode.insertBefore(g,s);
-                })();
-            """,
+                        %s;
+                        var d=document, g=d.createElement('script'), s=d.getElementsByTagName('script')[0];
+                        g.type='text/javascript'; g.async=true; g.defer=true; g.src=u+'matomo.js'; s.parentNode.insertBefore(g,s);
+                    })();
+                """,
         }
 
     def build_script(self):
@@ -206,7 +203,7 @@ class Matomo(object):
         """
         var_name = self.__generate_var_name()
         script = """
-        let %s = document.getElementById('%s');
+        const %s = document.getElementById('%s');
         %s.addEventListener('%s',
                     function(){
                         %s;
@@ -287,4 +284,3 @@ class Matomo(object):
         if request.COOKIES.get('mtm_consent', None):
             return True
         return settings.MATOMO_DEFAULT_CONSENT
-

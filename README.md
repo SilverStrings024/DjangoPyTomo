@@ -1,3 +1,7 @@
+# Note that this package is not yet finished.
+**Once it's finished, it will be packaged and released on pypi**
+
+
 ## TODO
 1. Format script piece #1 to use any provided/default tracker configurations<br/>
 2. Create settings validator/parser object<br/>
@@ -24,8 +28,9 @@
 4. Run your server!<br/>
 
 ## Settings<br/>
+**Please note that you can configure the tracker by using the `{{matomo|add_cmd:"..."}}` template tag**<br/>
 You must define your settings by declaring a dictionary called `MATOMO_CONFIG`.
-Each outer most key will correspond to a different tracker configuration ([You can find that here]()). **NOTE:** not all configurations are currently available in this package. Please refer to [Available Configs](#available-configs) for an updated list of possible tracker configurations.
+Each outer most key will correspond to a different tracker configuration ([You can find that here](https://developer.matomo.org/api-reference/tracking-javascript)). **NOTE:** not all configurations are currently available in this package; however, you can use `{{matomo|add_cmd:"..."}}` to insert configuration commands into the script. Please refer to [Available Configs](#available-configs) for an updated list of possible tracker configurations.
 Also note that it is possible to use the `add_cmd` template tag to configure the matomo tracker for certain configurations.
 <br/>
 
@@ -70,4 +75,7 @@ Simply add `matomo.context_processors.default_tracker` to your context processor
 **Please note**, you still have the ability to add to the default tracker in your templates via the `{{matomo|add_cmd:"..."}}` and `{{matomo|get_updated_tracker}}` template tags. For more information on what the default tracker contains, see [The Default Tracker](#the-default-tracker)
 
 #### Context Processors
-# **FINISH ME**
+###### **FINISH ME**
+
+#### The Default Tracker
+###### **FINISH ME**
